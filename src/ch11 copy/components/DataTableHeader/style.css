@@ -1,0 +1,39 @@
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    border: 1px solid #dbdbdb;
+    padding: 10px 20px;
+    width: 100%;
+    height: 60px;
+}
+
+.input-group > input {
+    margin-right: 5px;
+    outline: none;
+    box-sizing: border-box;
+    border: 1px solid #dbdbdb;
+    padding: 7px 10px;
+    width: 250px;
+    &:focus {
+        border: 2px solid #888888;
+    }
+
+}
+
+.button-group > button {
+    margin-left: 5px;
+    box-sizing: border-box;
+    border: 1px solid #dbdbdb;
+    padding: 5px 20px;
+    background-color: white;
+    font-weight: 600;
+    cursor: pointer;
+    &:hover {
+        background-color: #fafafa;
+    }
+    &:active {
+        background-color: #eeeeee;
+    }
+}

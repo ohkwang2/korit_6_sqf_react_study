@@ -1,106 +1,88 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./style.css"
+import Swal from "sweetalert2";
 
-function DataTableHeader({ mode, setMode, products, setProducts, isChecked, setIsChecked }) {
-    const today = new Date();
-    let initialId = parseInt(`${today.getFullYear()}${today.getMonth()+1}${today.getDate()}001`);
-    // console.log(initialId);
+function DataTableHeader({ mode, setMode, setProducts, setDeleting }) {
 
     const emptyProduct = {
-        id: 0,
+        id: "",
         productName: "",
         size: "",
         color: "",
         price: ""
     }
 
-    const inputRef = {
+    const inputRefs = {
         productName: useRef(),
         size: useRef(),
         color: useRef(),
         price: useRef()
     }
 
-    const [ inputProduct, setInputProduct ] = useState({ ...emptyProduct });
-
-    const getNewId = () => {
-        const productIds = products.map(product => product.id);
-        const maxProductId = productIds.length === 0 ? initialId : Math.max.apply(null, productIds);
-        // console.log(maxProductId);
-        return maxProductId + 1;
-    }
-
-    const excludeAtrribute = (array, key) => {
-        return array.map(obj => {
-          const { [key]: _, ...restArrays } = obj;
-          return restArrays;
-        });
-    };
-      
-    const validation = (array, targetObject) => {
-        return array.some(obj => {
-            return Object.keys(targetObject).every(key => obj[key] === targetObject[key]);
-        });
-    };  
-
-    const InputValidation = (inputProduct) => {
-        const newProducts = excludeAtrribute(products, "id");
-        const { ["id"]:_, ...sortedInputProduct } = inputProduct;
-        // console.log(newProducts)
-        // console.log(sortedInputProduct)
-        if(validation(products, sortedInputProduct)) {
-            alert("중복된 값이 이미 존재합니다. 다른 값을 입력하세요");
-            return;
-        }
-        addItem(inputProduct);
-    }
-
-    const addItem = (inputProduct) => {
-        setProducts(products => 
-            {inputProduct.id = getNewId();
-                return (
-                    [
-                        ...products,
-                        inputProduct]
-                )
-            });
-        alert("상품추가");
-        clearInputValue();
-    }
-
-    const clearInputValue = () => {
-        setInputProduct(inputProduct =>{
-            return {
-                ...emptyProduct
-            }
-        });
-    }
+    const [ inputData, setInputData ] = useState({ ...emptyProduct });
 
     const handleChangeModeClick = (e) => {
         setMode(parseInt(e.target.value));
     }
 
     const handleInputChange = (e) => {
-        setInputProduct(inputProduct => {
+        // 값으로 객체를 넣고 싶으면 (inputData => ({객체}));
+        // setInputData(inputData => ({
+        //         ...inputData,
+        //         [e.target.name]: e.target.value
+        // }));
+        setInputData(inputData => {
             return {
-                ...inputProduct,
+                ...inputData,
                 [e.target.name]: e.target.value
             }
         })
     }
 
+    const getNewId = (products) => {
+        const productIds = products.map(product => product.id);
+        const maxId =
+            productIds.length === 0
+                ? 0
+                : Math.max.apply(null, productIds);
+        return maxId;
+    }
+
     const handleSubmitClick = () => {
         if(mode === 1) {
-            InputValidation(inputProduct);
-            return;
+            setProducts(products => {
+                return ([
+                    ...products,
+                    // key값이 해당 변수에 존재하는 이름이면 그냥 써도 되는데, 매개변수로 받아 올 경우 []로 감싸주어야 함.
+                    { ...inputData, id: getNewId(products) + 1}
+                ]);
+            });
+            Swal.fire({
+                title: "상품 정보 추가 완료",
+                icon: "success",
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 500
+            });
+            resetMode(0);
         }
         if(mode === 2) {
-            alert("상품수정");
+            alert("상품 수정");
         }
         if(mode === 3) {
-            alert("상품삭제");
+            Swal.fire({
+                title: "상품 정보 삭제",
+                text: "정말로 삭제 하시겠습니까?",
+                showCancelButton: true,
+                confirmButtonText: "삭제",
+                confirmButtonColor: "red",
+                cancelButtonText: "취소"
+            }).then(result => {
+                if(result.isConfirmed) {
+                    setDeleting(true);
+                }
+            });
         }
-        setMode(0);
     }
 
     const handleCancelClick = () => {
@@ -109,14 +91,12 @@ function DataTableHeader({ mode, setMode, products, setProducts, isChecked, setI
 
     const resetMode = () => {
         setMode(0);
+        setInputData({ ...emptyProduct });
     }
-
-    // [ inputProductList, setInputProdcutList ] = useState({...emptyProductList});
-    // [ productList, setProduct ] = useState([]);
 
     const handleInputKeyDown = (e) => {
         if(e.keyCode === 13) {
-            const { productName, size, color, price } = inputRef;
+            const { productName, size, color, price } = inputRefs;
             switch(e.target.name) {
                 case "productName":
                     size.current.focus();
@@ -140,34 +120,50 @@ function DataTableHeader({ mode, setMode, products, setProducts, isChecked, setI
     return (
         <div className="table-header">
             <div className="input-group">
-                <input name="productName" type="text" placeholder="상품명"
-                disabled={mode === 0 || mode === 3}
-                onChange={handleInputChange}
-                onKeyDown={handleInputKeyDown}
-                ref={inputRef.productName}
-                value={inputProduct.productName}
-                autoFocus/>
+                <input
+                    name="productName"
+                    type="text"
+                    placeholder="상품명"
+                    disabled={mode === 0 || mode === 3}
+                    onChange={handleInputChange}
+                    onKeyDown={handleInputKeyDown}
+                    ref={inputRefs.productName}
+                    value={inputData.productName}
+                    autoFocus
+                />
 
-                <input name="size" type="text" placeholder="사이즈"
-                disabled={mode === 0 || mode === 3}
-                onChange={handleInputChange}
-                onKeyDown={handleInputKeyDown}
-                value={inputProduct.size}
-                ref={inputRef.size}/>
+                <input
+                    name="size"
+                    type="text"
+                    placeholder="사이즈"
+                    disabled={mode === 0 || mode === 3}
+                    onChange={handleInputChange}
+                    onKeyDown={handleInputKeyDown}
+                    value={inputData.size}
+                    ref={inputRefs.size}
+                />
 
-                <input name="color" type="text" placeholder="색상"
-                disabled={mode === 0 || mode === 3}
-                onChange={handleInputChange}
-                onKeyDown={handleInputKeyDown}
-                value={inputProduct.color}
-                ref={inputRef.color}/>
+                <input
+                    name="color"
+                    type="text"
+                    placeholder="색상"
+                    disabled={mode === 0 || mode === 3}
+                    onChange={handleInputChange}
+                    onKeyDown={handleInputKeyDown}
+                    value={inputData.color}
+                    ref={inputRefs.color}
+                />
 
-                <input name="price" type="text" placeholder="가격"
-                disabled={mode === 0 || mode === 3}
-                onChange={handleInputChange}
-                onKeyDown={handleInputKeyDown}
-                value={inputProduct.price}
-                ref={inputRef.price}/>
+                <input
+                    name="price"
+                    type="text"
+                    placeholder="가격"
+                    disabled={mode === 0 || mode === 3}
+                    onChange={handleInputChange}
+                    onKeyDown={handleInputKeyDown}
+                    value={inputData.price}
+                    ref={inputRefs.price}
+                />
             </div>
             <div>
                 {
