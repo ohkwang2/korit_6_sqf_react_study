@@ -1,22 +1,98 @@
 import { useRef, useState } from "react";
 import "./style.css"
 
-function DataTableHeader({ mode, setMode }) {
+function DataTableHeader({ mode, setMode, products, setProducts, isChecked, setIsChecked }) {
+    const today = new Date();
+    let initialId = parseInt(`${today.getFullYear()}${today.getMonth()+1}${today.getDate()}001`);
+    // console.log(initialId);
+
+    const emptyProduct = {
+        id: 0,
+        productName: "",
+        size: "",
+        color: "",
+        price: ""
+    }
 
     const inputRef = {
-        a: useRef(),
-        b: useRef(),
-        c: useRef(),
-        d: useRef()
+        productName: useRef(),
+        size: useRef(),
+        color: useRef(),
+        price: useRef()
+    }
+
+    const [ inputProduct, setInputProduct ] = useState({ ...emptyProduct });
+
+    const getNewId = () => {
+        const productIds = products.map(product => product.id);
+        const maxProductId = productIds.length === 0 ? initialId : Math.max.apply(null, productIds);
+        // console.log(maxProductId);
+        return maxProductId + 1;
+    }
+
+    const excludeAtrribute = (array, key) => {
+        return array.map(obj => {
+          const { [key]: _, ...restArrays } = obj;
+          return restArrays;
+        });
+    };
+      
+    const validation = (array, targetObject) => {
+        return array.some(obj => {
+            return Object.keys(targetObject).every(key => obj[key] === targetObject[key]);
+        });
+    };  
+
+    const InputValidation = (inputProduct) => {
+        const newProducts = excludeAtrribute(products, "id");
+        const { ["id"]:_, ...sortedInputProduct } = inputProduct;
+        // console.log(newProducts)
+        // console.log(sortedInputProduct)
+        if(validation(products, sortedInputProduct)) {
+            alert("중복된 값이 이미 존재합니다. 다른 값을 입력하세요");
+            return;
+        }
+        addItem(inputProduct);
+    }
+
+    const addItem = (inputProduct) => {
+        setProducts(products => 
+            {inputProduct.id = getNewId();
+                return (
+                    [
+                        ...products,
+                        inputProduct]
+                )
+            });
+        alert("상품추가");
+        clearInputValue();
+    }
+
+    const clearInputValue = () => {
+        setInputProduct(inputProduct =>{
+            return {
+                ...emptyProduct
+            }
+        });
     }
 
     const handleChangeModeClick = (e) => {
         setMode(parseInt(e.target.value));
     }
 
+    const handleInputChange = (e) => {
+        setInputProduct(inputProduct => {
+            return {
+                ...inputProduct,
+                [e.target.name]: e.target.value
+            }
+        })
+    }
+
     const handleSubmitClick = () => {
         if(mode === 1) {
-            alert("상품추가");
+            InputValidation(inputProduct);
+            return;
         }
         if(mode === 2) {
             alert("상품수정");
@@ -40,19 +116,20 @@ function DataTableHeader({ mode, setMode }) {
 
     const handleInputKeyDown = (e) => {
         if(e.keyCode === 13) {
-            const { a, b, c, d } = inputRef;
+            const { productName, size, color, price } = inputRef;
             switch(e.target.name) {
-                case "a":
-                    b.current.focus();
+                case "productName":
+                    size.current.focus();
                     break;
-                case "b":
-                    c.current.focus();
+                case "size":
+                    color.current.focus();
                     break;
-                case "c":
-                    d.current.focus();
+                case "color":
+                    price.current.focus();
                     break;
-                case "d":
-                    a.current.focus();
+                case "price":
+                    handleSubmitClick();
+                    productName.current.focus();
                     break;
                 default:
             }
@@ -63,26 +140,34 @@ function DataTableHeader({ mode, setMode }) {
     return (
         <div className="table-header">
             <div className="input-group">
-                <input name="a" type="text" placeholder="상품명"
-                disabled={mode === 0 || mode === 3} 
+                <input name="productName" type="text" placeholder="상품명"
+                disabled={mode === 0 || mode === 3}
+                onChange={handleInputChange}
                 onKeyDown={handleInputKeyDown}
-                ref={inputRef.a}
+                ref={inputRef.productName}
+                value={inputProduct.productName}
                 autoFocus/>
 
-                <input name="b" type="text" placeholder="사이즈"
+                <input name="size" type="text" placeholder="사이즈"
                 disabled={mode === 0 || mode === 3}
+                onChange={handleInputChange}
                 onKeyDown={handleInputKeyDown}
-                ref={inputRef.b}/>
+                value={inputProduct.size}
+                ref={inputRef.size}/>
 
-                <input name="c" type="text" placeholder="색상"
+                <input name="color" type="text" placeholder="색상"
                 disabled={mode === 0 || mode === 3}
+                onChange={handleInputChange}
                 onKeyDown={handleInputKeyDown}
-                ref={inputRef.c}/>
+                value={inputProduct.color}
+                ref={inputRef.color}/>
 
-                <input name="d" type="text" placeholder="가격"
+                <input name="price" type="text" placeholder="가격"
                 disabled={mode === 0 || mode === 3}
+                onChange={handleInputChange}
                 onKeyDown={handleInputKeyDown}
-                ref={inputRef.d}/>
+                value={inputProduct.price}
+                ref={inputRef.price}/>
             </div>
             <div>
                 {

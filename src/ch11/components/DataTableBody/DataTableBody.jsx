@@ -1,12 +1,29 @@
+import { useState } from "react";
+import DataTableHeader from "../DataTableHeader/DataTableHeader";
 import "./style.css"
 
-function DataTableBody({ mode, products }) {
+function DataTableBody({ mode, products, isChecked, setIsChecked }) {
+
+    // const saveLocalStorage = () => {
+    //     localStorage.setItem("products", JSON.stringify(products));
+    // }
+
+    // const loadFromLocalStorage = () => {
+    //     const lsProducts = localStorage.getItem("products");
+    //     products = !lsProducts ? [] : JSON.parse(lsProducts);
+    //     return products;
+    // }
+
+    const handleCheckThBoxChange = () => {
+            setIsChecked(!isChecked);
+    }
+    
     return (
         <div className="table-body">
             <table>
                 <thead>
                     <tr>
-                        <th><input type="checkbox" disabled={mode !== 3}/></th>
+                        <th><input type="checkbox"  onChange={handleCheckThBoxChange} disabled={mode !== 3} checked={isChecked}/></th>
                         <th>상품코드</th>
                         <th>상품명</th>
                         <th>사이즈</th>
@@ -19,7 +36,7 @@ function DataTableBody({ mode, products }) {
                         products.map(products => {
                             return (
                                 <tr key={products.id}>
-                                    <th><input type="checkbox" disabled={mode === 0 || mode === 1} /></th>
+                                    <th><input type="checkbox" disabled={mode === 0 || mode === 1} checked={isChecked} /></th>
                                     <td>{products.id}</td>
                                     <td>{products.productName}</td>
                                     <td>{products.size}</td>
