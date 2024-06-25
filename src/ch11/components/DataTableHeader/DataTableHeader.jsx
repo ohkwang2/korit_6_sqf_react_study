@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./style.css"
 import Swal from "sweetalert2";
 
-function DataTableHeader({ mode, setMode, setProducts, setDeleting }) {
+function DataTableHeader({ mode, setMode, products, setProducts, setDeleting, editProductId }) {
 
     const emptyProduct = {
         id: "",
@@ -20,6 +20,11 @@ function DataTableHeader({ mode, setMode, setProducts, setDeleting }) {
     }
 
     const [ inputData, setInputData ] = useState({ ...emptyProduct });
+
+    useEffect(() => {
+        const [ product ] = products.filter(product => product.id === editProductId);
+        setInputData(!product ? { ...emptyProduct } : { ...product });   // 프로덕트가 빈 값이면 (checked된 값이 없으면) 빈 값을 넣어줌.
+    }, [editProductId]);
 
     const handleChangeModeClick = (e) => {
         setMode(parseInt(e.target.value));
@@ -60,14 +65,36 @@ function DataTableHeader({ mode, setMode, setProducts, setDeleting }) {
             Swal.fire({
                 title: "상품 정보 추가 완료",
                 icon: "success",
-                position: "top-end",
+                position: "center",
                 showConfirmButton: false,
                 timer: 500
             });
-            resetMode(0);
+            resetMode();
         }
         if(mode === 2) {
-            alert("상품 수정");
+            Swal.fire({
+                title: "상품 정보 수정",
+                showCancelButton: true,
+                confirmButtonText: "확인",
+                cancelButtonText: "취소",
+            }).then(result => {
+                if(result.isConfirmed){
+                    setProducts(products => [
+                        ...products.map(product => {
+                            if(product.id === editProductId) {
+                                const { id, ...rest } = inputData;
+                                // id값이 문자열이 될 수 있기 때문에 id는 기존 것을 두고 나머지 값만 대체하여 넣음
+                                return {
+                                    ...product,
+                                    ...rest
+                                }
+                            }
+                            return product;
+                        })
+                    ]);
+                    resetMode();
+                }
+            });
         }
         if(mode === 3) {
             Swal.fire({

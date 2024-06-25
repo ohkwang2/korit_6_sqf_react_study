@@ -11,6 +11,7 @@ function DataTable() {
     const [ mode, setMode ] = useState(0);
     const [ products, setProducts] = useState([ ...SAMPLE_PRODUCTS ]);
     const [ isDeleting, setDeleting ] = useState(false);
+    const [ editProductId, setEditProductId ] = useState(0);
 
     // 페이지가 최초에 한 번 열렸을 때
     // 맨 처음 한 번 디펜던시를 비워주기 위함
@@ -31,12 +32,14 @@ function DataTable() {
                 mode={mode} setMode={setMode}
                 products={products} setProducts={setProducts}
                 setDeleting={setDeleting}
+                editProductId={editProductId}
             />
 
             <DataTableBody
                 mode={mode} setMode={setMode}
                 products={products} setProducts={setProducts}
                 isDeleting={isDeleting} setDeleting={setDeleting}
+                setEditProductId={setEditProductId}
             />
         </div>
     );

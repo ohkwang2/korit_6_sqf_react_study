@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./style.css"
 
-function DataTableBody({ mode, setMode, products, setProducts, isDeleting, setDeleting }) {
+function DataTableBody({ mode, setMode, products, setProducts, isDeleting, setDeleting, setEditProductId }) {
     
     const [ viewProducts, setViewProducts ] = useState([]);
     const [ checkedAll, setCheckedAll ] = useState(false);
@@ -38,6 +38,13 @@ function DataTableBody({ mode, setMode, products, setProducts, isDeleting, setDe
             setDeleting(false);
         }
     }, [isDeleting])
+
+    useEffect(() => {
+        if(mode === 2) {
+            const [ selectedProduct ] = viewProducts.filter(product => product.isChecked);
+            setEditProductId(!selectedProduct ? 0 : selectedProduct.id);
+        }
+    }, [viewProducts]);
     
     const resetViewProducts = () => {
         // products를 가지고 와서 전부 반복을 돌려서 checked 속성을 부여하고 false로 바꿔줌.
