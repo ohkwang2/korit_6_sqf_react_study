@@ -1,21 +1,91 @@
-import { useState } from "react";
-import DataTableHeader from "../DataTableHeader/DataTableHeader";
+import { useEffect, useRef, useState } from "react";
 import "./style.css"
 
-function DataTableBody({ mode, products, isChecked, setIsChecked }) {
+function DataTableBody({ mode, setMode, products, setProducts, setEditProductId, setEditProductIds }) {
+    
+    const [ viewProducts, setViewProducts ] = useState([]);
+    const [ checkedAll, setCheckedAll ] = useState(false);
 
-    // const saveLocalStorage = () => {
-    //     localStorage.setItem("products", JSON.stringify(products));
-    // }
+    // 최초 렌더링시 resetCheck()가 동작되어 checked가 reset됨
+    useEffect(() => {
+        if(mode === 0) {
+            // product나 mode가 변하면 checked를 reset
+            resetViewProducts();
+            // 모드가 바뀌면 전체선택 checked를 reset
+            setCheckedAll(false);
+        }
+    }, [products, mode]);
 
-    // const loadFromLocalStorage = () => {
-    //     const lsProducts = localStorage.getItem("products");
-    //     products = !lsProducts ? [] : JSON.parse(lsProducts);
-    //     return products;
-    // }
+    useEffect(() => {
+        if(mode === 2) {
+            const [ selectedProduct ] = viewProducts.filter(product => product.isChecked);
+            setEditProductId(!selectedProduct ? 0 : selectedProduct.id);
+        }
+        if(mode === 3) {
+            const selectedProducts = [...viewProducts.filter(product => product.isChecked)];
+            setEditProductIds(!selectedProducts.length ? [] : selectedProducts.map(p => p.id));
+        }
+        const checkStates = viewProducts.map(product => product.isChecked);
+        if(checkStates.includes(false)) {
+            setCheckedAll(false);
+        }else {
+            setCheckedAll(true);
+        }
+    }, [viewProducts]);
+    
+    const resetViewProducts = () => {
+        // products를 가지고 와서 전부 반복을 돌려서 checked 속성을 부여하고 false로 바꿔줌.
+        setViewProducts([ ...products.map(product => ({...product, isChecked: false})) ]);
+    }
 
-    const handleCheckThBoxChange = () => {
-            setIsChecked(!isChecked);
+    const handleCheckedChange = (e) => {
+        if(mode === 2) {
+            setViewProducts(viewProducts => {
+                return [ ...viewProducts.map(product => {
+                    if(product.id === parseInt(e.target.value)) {
+                        return {
+                            ...product,
+                            // checked 속성을 '!'을 활용하여 토글 시켜서 계속 바꿔줄 수 있게 설정
+                            isChecked: !product.isChecked
+                        }
+                    }
+                    return {
+                        ...product,
+                        // checked 속성을 '!'을 활용하여 토글 시켜서 계속 바꿔줄 수 있게 설정
+                        isChecked: false
+                    };
+                })];
+            });
+        }
+        if(mode === 3) {
+            setViewProducts(viewProducts => {
+                return [ ...viewProducts.map(product => {
+                    if(product.id === parseInt(e.target.value)) {
+                        return {
+                            ...product,
+                            // checked 속성을 '!'을 활용하여 토글 시켜서 계속 바꿔줄 수 있게 설정
+                            isChecked: !product.isChecked
+                        }
+                    }
+                    return product;
+                })];
+            })
+        }
+        
+    }
+
+    const handleCheckedAllChange = (e) => {
+        // 이벤트 동작으로 인한 변화와 checked 상태의 변화를 분리
+        setCheckedAll(checked => {
+            if(!checkedAll) {
+                setViewProducts([ ...products.map(product => ({...product, isChecked: true})) ]);
+                // 여기서 return을 쓰면 언마운트로 사용 됨
+                // return
+            } else {
+                resetViewProducts();
+            }
+            return !checked
+        });
     }
     
     return (
@@ -23,7 +93,13 @@ function DataTableBody({ mode, products, isChecked, setIsChecked }) {
             <table>
                 <thead>
                     <tr>
-                        <th><input type="checkbox"  onChange={handleCheckThBoxChange} disabled={mode !== 3} checked={isChecked}/></th>
+                        <th><input
+                            type="checkbox"
+                            disabled={mode !== 3}
+                            onChange={handleCheckedAllChange}
+                            checked={checkedAll}
+                        />
+                        </th>
                         <th>상품코드</th>
                         <th>상품명</th>
                         <th>사이즈</th>
@@ -33,15 +109,22 @@ function DataTableBody({ mode, products, isChecked, setIsChecked }) {
                 </thead>
                 <tbody>
                     {
-                        products.map(products => {
+                        viewProducts.map(product => {
                             return (
-                                <tr key={products.id}>
-                                    <th><input type="checkbox" disabled={mode === 0 || mode === 1} checked={isChecked} /></th>
-                                    <td>{products.id}</td>
-                                    <td>{products.productName}</td>
-                                    <td>{products.size}</td>
-                                    <td>{products.color}</td>
-                                    <td>{products.price}</td>
+                                <tr key={product.id}>
+                                    <th><input
+                                        type="checkbox"
+                                        disabled={mode === 0 || mode === 1}
+                                        onChange={handleCheckedChange}
+                                        checked={product.isChecked}
+                                        value={product.id}
+                                    />
+                                    </th>
+                                    <td>{product.id}</td>
+                                    <td>{product.productName}</td>
+                                    <td>{product.size}</td>
+                                    <td>{product.color}</td>
+                                    <td>{product.price}</td>
                                 </tr>
                             )
                         })

@@ -22,6 +22,7 @@ function DataTableHeader({ mode, setMode, products, setProducts, setDeleting, ed
     const [ inputData, setInputData ] = useState({ ...emptyProduct });
 
     useEffect(() => {
+        // const [ product ] = products.filter(product => product.id === editProductId);
         const [ product ] = products.filter(product => product.id === editProductId);
         setInputData(!product ? { ...emptyProduct } : { ...product });   // 프로덕트가 빈 값이면 (checked된 값이 없으면) 빈 값을 넣어줌.
     }, [editProductId]);

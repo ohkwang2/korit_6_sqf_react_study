@@ -1,62 +1,62 @@
 export const SAMPLE_PRODUCTS = [
     {
-        id: 2024520001,
+        id: 1,
         productName: "a",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520002,
+        id: 2,
         productName: "b",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520003,
+        id: 3,
         productName: "c",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520004,
+        id: 4,
         productName: "d",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520005,
+        id: 5,
         productName: "e",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520006,
+        id: 6,
         productName: "f",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520007,
+        id: 7,
         productName: "g",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520008,
+        id: 8,
         productName: "h",
         size: "s",
         color: "red",
         price: 10000
     },
     {
-        id: 2024520009,
+        id: 9,
         productName: "i",
         size: "s",
         color: "red",
