@@ -73,6 +73,7 @@ html, body, #root {
     width: 650px;
     font-size: 16px;
     border-radius: 5px;
+    object-fit: cover;
     color: white;
     background-color: #333333;
     cursor: pointer;
