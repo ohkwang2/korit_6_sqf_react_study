@@ -1,5 +1,6 @@
 import MainHeader from "./components/MainHeader/MainHeader";
 import MainLayout from "./components/MainLayout/MainLayout";
+import MainBody from "./components/MainBody/MainBody";
 import MainSidebar from "./components/MainSidebar/MainSidebar";
 import { Global } from "@emotion/react";
 import { reset } from "./styles/global";
@@ -15,6 +16,7 @@ function App() {
                 <MainHeader
                     setMainSidebarShow={setMainSidebarShow}
                     />
+                <MainBody />
                 <MainSidebar
                     isMainSidebarShow={isMainSidebarShow}
                     setMainSidebarShow={setMainSidebarShow}

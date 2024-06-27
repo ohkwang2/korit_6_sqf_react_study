@@ -20,6 +20,7 @@ function App() {
             setNames(names => [ ...names, inputValue ]);
             setInputValue("");
         }
+
     }
 
     return <>
